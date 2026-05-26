@@ -1,0 +1,17 @@
+https://www.tinkercad.com/things/8IMfIJatc2p/editel?sharecode=qfdJlhW2BD9c_fJkRmjtyOD1l9bEvn_Z63HRWEAHTRY
+
+Nome	Quantidade	Componente
+
+U1	1	Arduino Uno R3
+
+R1
+R2
+R3
+R4	4	1 kΩ Resistor
+
+D1	1	Verde LED
+S1
+
+S2	2	Botão
+
+D2	1	Vermelho LED
