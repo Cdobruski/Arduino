@@ -1,0 +1,61 @@
+import serial
+import time
+
+# MUDE PARA SUA PORTA COM
+arduino = serial.Serial("COM3", 9600)
+
+time.sleep(2)
+
+print("Arduino conectado.")
+
+while True:
+
+    if arduino.in_waiting:
+
+        escolha = arduino.readline().decode().strip()
+
+        print("Escolha recebida:", escolha)
+
+        # AQUI ENTRA SEU JOGO
+
+        if escolha == "SIM":
+
+            print("Jogador escolheu SIM")
+
+            # sua lógica aqui
+
+        elif escolha == "NAO":
+
+            print("Jogador escolheu NÃO")
+
+            # sua lógica aquiimport serial
+import time
+
+# MUDE PARA SUA PORTA COM
+arduino = serial.Serial("COM3", 9600)
+
+time.sleep(2)
+
+print("Arduino conectado.")
+
+while True:
+
+    if arduino.in_waiting:
+
+        escolha = arduino.readline().decode().strip()
+
+        print("Escolha recebida:", escolha)
+
+        # AQUI ENTRA SEU JOGO
+
+        if escolha == "SIM":
+
+            print("Jogador escolheu SIM")
+
+            # sua lógica aqui
+
+        elif escolha == "NAO":
+
+            print("Jogador escolheu NÃO")
+
+            # sua lógica aqui
