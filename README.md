@@ -1,4 +1,4 @@
-<h1 align="center">
+﻿<h1 align="center">
   ⚖️ Dilemas Éticos: IA & Hardware Engine
 </h1>
 
@@ -10,14 +10,14 @@
 </p>
 
 <p align="center">
-  Uma engine de narrativa ramificada interativa, construída para explorar consequências morais através de integração de hardware (Arduino), modelos de IA Generativa e uma interface gráfica fluida.
+  Uma engine de narrativa ramificada interativa, construída para explorar consequências morais por meio da integração de hardware (Arduino), IA e uma interface gráfica fluida.
 </p>
 
 ---
 
 ## 📌 Índice
 * [Sobre o Projeto](#-sobre-o-projeto)
-* [Arquitetura & Clean Code](#%EF%B8%8F-arquitetura--clean-code)
+* [Arquitetura & Clean Code](#-arquitetura--clean-code)
 * [Interface e UX](#-interface-e-ux)
 * [Como Executar](#-como-executar)
 * [Integração Futura (Roadmap)](#-integração-futura-roadmap)
@@ -25,53 +25,63 @@
 ---
 
 ## 📖 Sobre o Projeto
-Este sistema submete o usuário a cenários éticos complexos onde não há saída neutra — apenas decisões binárias de **SIM** ou **NÃO**. Projetado para demonstrar o fluxo de dados em tempo real entre um microcontrolador (atuando como sensor/gatilho) e uma aplicação Python local, alimentada por IA.
+Este sistema apresenta ao usuário cenários éticos complexos onde não há saída neutra — apenas decisões binárias de **SIM** ou **NÃO**. Foi projetado para demonstrar o fluxo de dados em tempo real entre um microcontrolador (sensor/gatilho) e uma aplicação Python local, alimentada por IA.
 
 ### ✨ Principais Funcionalidades
-- **Árvore de Decisão Dinâmica:** Respostas moldam o próximo cenário instantaneamente.
-- **Isolamento de Hardware:** Camada dedicada para leitura Serial assíncrona, evitando travamentos na interface.
-- **IA Generativa (Plug & Play):** Arquitetura pronta para acoplar APIs de geração de texto (LLMs) para criar ramificações narrativas infinitas.
+- **Árvore de decisão dinâmica:** respostas moldam o próximo cenário instantaneamente.
+- **Isolamento de hardware:** camada dedicada para leitura serial assíncrona, evitando travamentos na interface.
+- **IA generativa (plug & play):** arquitetura pronta para conectar APIs de geração de texto (LLMs).
 
 ---
 
 ## ⚙️ Arquitetura & Clean Code
-O projeto foi estruturado seguindo os princípios **SOLID** e **KISS**, separando estritamente a visão (View), o controle da lógica (Controller) e a integração externa (Hardware/AI).
+O projeto segue princípios de separação de responsabilidades, mantendo a visão (View), a lógica (Controller) e a integração externa (Hardware/AI) bem isoladas.
 
 <details>
-<summary><b>📂 Clique para expandir a Estrutura de Diretórios</b></summary>
+<summary><b>📂 Estrutura de Diretórios</b></summary>
 <br>
 
 ```text
-projeto_arduino_python/
-├── arduino/
-│   └── firmware/
-│       └── firmware.ino           # Código C/C++ da placa
-├── python/
-│   ├── src/
-│   │   ├── hardware/              # Leitura/escrita da porta serial
-│   │   ├── core/                  
-│   │   │   └── ai_client.py       # Wrapper isolado para chamadas de API (IA)
-│   │   ├── ui/                    
-│   │   │   └── main_window.py     # Interface gráfica e folhas de estilo (QSS)
-│   │   └── main.py                # Ponto de entrada, Threads e Orquestração
-│   ├── tests/                     # Testes unitários
-│   ├── config.json                # Configurações de ambiente (COM port, API keys)
-│   └── requirements.txt           # Dependências (PyQt5)
-└── README.md
-## ?? Como Executar
+Arduino/
+├── core/
+│   ├── ai_client.py
+│   └── data_parser.py
+├── hardware/
+│   └── serial_client.py
+├── ui/
+│   └── main_window.py
+├── Placa/
+│   └── codigoplaca.c
+├── config.json
+├── requirements.txt
+├── README.md
+└── main.py
+```
+</details>
 
-1. Instale as depend�ncias do Python:
+---
+
+## 🚀 Como Executar
+
+1. Instale as dependências do Python:
    ```bash
    pip install -r requirements.txt
    ```
-2. Ajuste a porta serial no `config.json` para a COM correta do seu Arduino.
-3. Carregue o firmware em `Placa/codigoplaca.c` na placa Arduino e abra a porta serial.
+2. Ajuste a porta serial em `config.json` para a COM correta do Arduino.
+3. Carregue o firmware em `Placa/codigoplaca.c` para o Arduino.
 4. Execute o programa Python:
    ```bash
    python main.py
    ```
 
 ### Como o Arduino interage
-- O firmware envia `BUTTON1:HIGH` quando o bot�o 1 � pressionado.
-- O firmware envia `BUTTON2:HIGH` quando o bot�o 2 � pressionado.
-- O Python converte esses eventos em escolhas `SIM` e `N�O`.
+- O firmware envia `BUTTON1:HIGH` quando o botão 1 é pressionado.
+- O firmware envia `BUTTON2:HIGH` quando o botão 2 é pressionado.
+- O Python converte esses eventos em escolhas `SIM` e `NÃO`.
+
+---
+
+## 📌 Integração Futura (Roadmap)
+- Melhorar o tratamento de erros de serial e reconexão automática.
+- Incluir suporte a outros protocolos de hardware.
+- Adicionar testes unitários para o parser serial e a lógica de controle.
