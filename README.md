@@ -24,7 +24,7 @@
 
 ---
 
-## 📖 Sobre o Projeto
+## 📖 Sobre o Quick Choice Idea
 Este sistema apresenta ao usuário cenários éticos complexos onde não há saída neutra — apenas decisões binárias de **SIM** ou **NÃO**. Foi projetado para demonstrar o fluxo de dados em tempo real entre um microcontrolador (sensor/gatilho) e uma aplicação Python local, alimentada por IA.
 
 ### ✨ Principais Funcionalidades
