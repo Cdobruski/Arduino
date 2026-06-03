@@ -58,3 +58,20 @@ projeto_arduino_python/
 │   ├── config.json                # Configurações de ambiente (COM port, API keys)
 │   └── requirements.txt           # Dependências (PyQt5)
 └── README.md
+## ?? Como Executar
+
+1. Instale as depend�ncias do Python:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Ajuste a porta serial no `config.json` para a COM correta do seu Arduino.
+3. Carregue o firmware em `Placa/codigoplaca.c` na placa Arduino e abra a porta serial.
+4. Execute o programa Python:
+   ```bash
+   python main.py
+   ```
+
+### Como o Arduino interage
+- O firmware envia `BUTTON1:HIGH` quando o bot�o 1 � pressionado.
+- O firmware envia `BUTTON2:HIGH` quando o bot�o 2 � pressionado.
+- O Python converte esses eventos em escolhas `SIM` e `N�O`.
