@@ -23,6 +23,7 @@ def load_config():
         "serial_port": "COM3",
         "baud_rate": 9600,
         "timeout": 1.0,
+        "gemini_api_key": "",
     }
 
     if os.path.exists(config_path):
@@ -62,12 +63,12 @@ class AppController:
     def __init__(self):
         self.app = QApplication(sys.argv)
         self.window = MainWindow()
-        self.ai_client = EthicalAIClient(api_key="SUA_CHAVE_AQUI")
 
         self.current_scenario = ""
         self.is_processing = False
 
         self.config = load_config()
+        self.ai_client = EthicalAIClient(api_key=self.config.get("gemini_api_key", ""))
         self.serial_thread = SerialReadThread(
             port=self.config["serial_port"],
             baudrate=self.config["baud_rate"],
