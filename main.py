@@ -12,18 +12,23 @@ from hardware.serial_client import SerialReadThread
 
 
 def load_config():
-    config_path = os.path.join(os.path.dirname(__file__), "config.json")
+    # Quando frozen (exe), config.json fica ao lado do executável
+    if getattr(sys, "frozen", False):
+        base = os.path.dirname(sys.executable)
+    else:
+        base = os.path.dirname(os.path.abspath(__file__))
+
+    config_path = os.path.join(base, "config.json")
     config = {
         "serial_port": "COM3",
         "baud_rate": 9600,
-        "timeout": 1.0
+        "timeout": 1.0,
     }
 
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as config_file:
-                user_config = json.load(config_file)
-                config.update(user_config)
+                config.update(json.load(config_file))
         except Exception as error:
             print(f"Aviso: falha ao carregar config.json: {error}")
 
@@ -78,17 +83,33 @@ class AppController:
         self.request_ai_generation()
 
     def on_serial_line(self, raw_line: str):
-        parsed = parse_serial_line(raw_line)
-        if parsed is None or self.is_processing:
+        line = raw_line.strip()
+
+        if line == "ARDUINO_READY":
+            self.window.chat_display.append(
+                '<div style="text-align:center; color:#4FC3A1; margin:12px 0;">'
+                '<b>— Arduino conectado e pronto —</b></div>'
+            )
+            return
+
+        parsed = parse_serial_line(line)
+        if parsed is None:
             return
 
         user_choice = parsed.get("choice")
         if user_choice is None:
             return
 
+        if self.is_processing:
+            self.window.chat_display.append(
+                '<div style="text-align:center; color:#888; margin:6px 0; font-size:14px;">'
+                '<i>Aguarde a IA responder antes de pressionar novamente.</i></div>'
+            )
+            return
+
         label = "SIM" if user_choice else "NÃO"
         self.window.chat_display.append(
-            f'<div style="text-align: left; color: #82DAFF; margin: 10px 0;"><b>Arduino: {label}</b></div>'
+            f'<div style="text-align:left; color:#82DAFF; margin:10px 0;"><b>Arduino: {label}</b></div>'
         )
 
         self.handle_user_choice(user_choice)
@@ -117,9 +138,6 @@ class AppController:
         self.is_processing = True
         self.window.display_scenario("<i>Processando desdobramentos éticos com IA...</i>")
 
-        self.window.btn_yes.setEnabled(False)
-        self.window.btn_no.setEnabled(False)
-
         self.worker = AIWorker(self.ai_client, scenario, choice)
         self.worker.finished.connect(self.on_ai_response)
         self.worker.start()
@@ -129,8 +147,6 @@ class AppController:
         self.window.display_scenario(self.current_scenario)
 
         self.is_processing = False
-        self.window.btn_yes.setEnabled(True)
-        self.window.btn_no.setEnabled(True)
 
     def run(self):
         self.window.show()
