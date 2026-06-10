@@ -1,12 +1,11 @@
-import google.generativeai as genai
+from groq import Groq
 
 
 class EthicalAIClient:
-    MODEL = "gemini-2.0-flash"
+    MODEL = "llama-3.3-70b-versatile"
 
     def __init__(self, api_key: str = ""):
-        genai.configure(api_key=api_key)
-        self._model = genai.GenerativeModel(self.MODEL)
+        self._client = Groq(api_key=api_key)
 
     def generate_initial_scenario(self) -> str:
         prompt = (
@@ -16,7 +15,12 @@ class EthicalAIClient:
             "Termine com uma pergunta direta que exija apenas Sim ou Não."
         )
         try:
-            return self._model.generate_content(prompt).text
+            resp = self._client.chat.completions.create(
+                model=self.MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=300,
+            )
+            return resp.choices[0].message.content
         except Exception as e:
             return f"Erro ao conectar com a IA: {e}"
 
@@ -30,6 +34,11 @@ class EthicalAIClient:
             "que também exija uma resposta Sim ou Não."
         )
         try:
-            return self._model.generate_content(prompt).text
+            resp = self._client.chat.completions.create(
+                model=self.MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=350,
+            )
+            return resp.choices[0].message.content
         except Exception as e:
             return f"Erro ao conectar com a IA: {e}"
