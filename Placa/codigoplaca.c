@@ -1,80 +1,21 @@
-// Componente reusável para controle de LEDs
-class Led {
-  private:
-    uint8_t pin;
-  public:
-    Led(uint8_t pinNumber) : pin(pinNumber) {}
-    
-    void init() {
-      pinMode(pin, OUTPUT);
-      setOff();
-    }
-    
-    void setOn() {
-      digitalWrite(pin, HIGH);
-    }
-    
-    void setOff() {
-      digitalWrite(pin, LOW);
-    }
-};
+const int luz = 8;
+const int botao = 2; // constante refere-se ao digital 2
 
-// Componente reusável para leitura de Botões com Debounce e Pull-up interno
-class DebouncedButton {
-  private:
-    uint8_t pin;
-    int state;
-    int lastReading;
-    unsigned long lastDebounceTime;
-    unsigned long debounceDelay;
-    
-  public:
-    DebouncedButton(uint8_t pinNumber, unsigned long debounceMs = 50) 
-      : pin(pinNumber), debounceDelay(debounceMs), state(HIGH), lastReading(HIGH), lastDebounceTime(0) {}
+const int luz2 = 11;
+const int botao2 = 5;
 
-    void init() {
-      // Ativa o resistor interno: pino lê HIGH quando aberto e LOW quando pressionado
-      pinMode(pin, INPUT_PULLUP); 
-    }
-
-    bool update() {
-      bool stateChanged = false;
-      int reading = digitalRead(pin);
-
-      if (reading != lastReading) {
-        lastDebounceTime = millis();
-      }
-
-      if ((millis() - lastDebounceTime) > debounceDelay) {
-        if (reading != state) {
-          state = reading;
-          stateChanged = true;
-        }
-      }
-
-      lastReading = reading;
-      return stateChanged;
-    }
-
-    bool isPressed() {
-      // Retorna true quando o pino é conectado ao GND (LOW)
-      return state == LOW;
-    }
-};
-
-// Instanciação dos componentes com as portas atuais
-Led luz1(8);
-DebouncedButton botao1(2);
-
-Led luz2(11);
-DebouncedButton botao2(5);
+int estadoBotaoAnterior = LOW;
+int estadoBotao2Anterior = LOW;
+unsigned long ultimaMudancaBotao = 0;
+unsigned long ultimaMudancaBotao2 = 0;
+const unsigned long debounceDelay = 50;
 
 void setup() {
-  luz1.init();
-  botao1.init();
-  
-  luz2.init();
-  botao2.init();
+  pinMode(luz, OUTPUT);
+  pinMode(botao, INPUT);
+
+  pinMode(luz2, OUTPUT);
+  pinMode(botao2, INPUT);
 
   Serial.begin(9600);
   delay(1000);
@@ -82,23 +23,39 @@ void setup() {
 }
 
 void loop() {
-  // Execução do Módulo 1 (Pino 2 -> Pino 8)
-  if (botao1.update()) {
-    if (botao1.isPressed()) {
-      luz1.setOn();
-      Serial.println("BUTTON1:HIGH");
-    } else {
-      luz1.setOff();
+  int leituraBotao = digitalRead(botao);
+  int leituraBotao2 = digitalRead(botao2);
+  unsigned long agora = millis();
+
+  if (leituraBotao != estadoBotaoAnterior) {
+    ultimaMudancaBotao = agora;
+  }
+
+  if ((agora - ultimaMudancaBotao) > debounceDelay) {
+    if (leituraBotao != estadoBotaoAnterior) {
+      estadoBotaoAnterior = leituraBotao;
+      if (leituraBotao == HIGH) {
+        digitalWrite(luz, HIGH);
+        Serial.println("BUTTON1:HIGH");
+      } else {
+        digitalWrite(luz, LOW);
+      }
     }
   }
 
-  // Execução do Módulo 2 (Pino 5 -> Pino 11)
-  if (botao2.update()) {
-    if (botao2.isPressed()) {
-      luz2.setOn();
-      Serial.println("BUTTON2:HIGH");
-    } else {
-      luz2.setOff();
+  if (leituraBotao2 != estadoBotao2Anterior) {
+    ultimaMudancaBotao2 = agora;
+  }
+
+  if ((agora - ultimaMudancaBotao2) > debounceDelay) {
+    if (leituraBotao2 != estadoBotao2Anterior) {
+      estadoBotao2Anterior = leituraBotao2;
+      if (leituraBotao2 == HIGH) {
+        digitalWrite(luz2, HIGH);
+        Serial.println("BUTTON2:HIGH");
+      } else {
+        digitalWrite(luz2, LOW);
+      }
     }
   }
 }
