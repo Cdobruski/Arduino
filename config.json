@@ -2,5 +2,5 @@
   "serial_port": "COM3",
   "baud_rate": 9600,
   "timeout": 1.0,
-  "gemini_api_key": "AQ.Ab8RN6JR450BA8wXUCvhyH7LccbMu63SEY8PCBAd82lKIpVX6A"
+  "gemini_api_key": ""
 }
