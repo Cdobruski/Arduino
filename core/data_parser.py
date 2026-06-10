@@ -23,12 +23,12 @@ def parse_serial_line(line: str):
     if normalized.startswith("BUTTON1:") or normalized.startswith("BUTTON1="):
         status = normalized.split(":", 1)[1] if ":" in normalized else normalized.split("=", 1)[1]
         if status == "HIGH":
-            return {"choice": True}
+            return {"choice": False}
 
     if normalized.startswith("BUTTON2:") or normalized.startswith("BUTTON2="):
         status = normalized.split(":", 1)[1] if ":" in normalized else normalized.split("=", 1)[1]
         if status == "HIGH":
-            return {"choice": False}
+            return {"choice": True}
 
     if normalized.startswith("CHOICE:") or normalized.startswith("CHOICE="):
         status = normalized.split(":", 1)[1] if ":" in normalized else normalized.split("=", 1)[1]
