@@ -1,4 +1,4 @@
-﻿<h1 align="center">
+<h1 align="center">
   ⚖️ Dilemas Éticos: IA & Hardware Engine
 </h1>
 
@@ -19,23 +19,27 @@
 * [Sobre o Projeto](#-sobre-o-projeto)
 * [Arquitetura & Clean Code](#-arquitetura--clean-code)
 * [Interface e UX](#-interface-e-ux)
+* [Hardware — Arduino](#-hardware--arduino)
 * [Como Executar](#-como-executar)
-* [Integração Futura (Roadmap)](#-integração-futura-roadmap)
+* [Gerar Executável (.exe)](#-gerar-executável-exe)
+* [Roadmap](#-roadmap)
 
 ---
 
 ## 📖 Sobre o Projeto
-Este sistema apresenta ao usuário cenários éticos complexos onde não há saída neutra — apenas decisões binárias de **SIM** ou **NÃO**. Foi projetado para demonstrar o fluxo de dados em tempo real entre um microcontrolador (sensor/gatilho) e uma aplicação Python local, alimentada por IA.
+Este sistema apresenta ao usuário cenários éticos complexos onde não há saída neutra — apenas decisões binárias de **SIM** ou **NÃO**. Foi projetado para demonstrar o fluxo de dados em tempo real entre um microcontrolador (sensor/gatilho) e uma aplicação Python local, alimentada por IA generativa.
 
 ### ✨ Principais Funcionalidades
-- **Árvore de decisão dinâmica:** respostas moldam o próximo cenário instantaneamente.
-- **Isolamento de hardware:** camada dedicada para leitura serial assíncrona, evitando travamentos na interface.
-- **IA generativa (plug & play):** arquitetura pronta para conectar APIs de geração de texto (LLMs).
+- **Árvore de decisão dinâmica:** respostas moldam o próximo cenário em tempo real.
+- **Controle via hardware:** as escolhas SIM/NÃO vêm exclusivamente dos botões físicos do Arduino — sem interação por mouse ou teclado.
+- **Interface imersiva:** fundo pixel-art de lua sobre a água com painel translúcido e texto de alto contraste.
+- **Isolamento de hardware:** leitura serial assíncrona em thread separada, evitando travamentos na UI.
+- **IA generativa (plug & play):** arquitetura pronta para conectar qualquer LLM via `core/ai_client.py`.
 
 ---
 
 ## ⚙️ Arquitetura & Clean Code
-O projeto segue princípios de separação de responsabilidades, mantendo a visão (View), a lógica (Controller) e a integração externa (Hardware/AI) bem isoladas.
+O projeto segue separação de responsabilidades — View, Controller, Hardware e IA completamente isolados.
 
 <details>
 <summary><b>📂 Estrutura de Diretórios</b></summary>
@@ -44,44 +48,94 @@ O projeto segue princípios de separação de responsabilidades, mantendo a vis�
 ```text
 Arduino/
 ├── core/
-│   ├── ai_client.py
-│   └── data_parser.py
+│   ├── ai_client.py       ← integração com a API de IA (plug & play)
+│   └── data_parser.py     ← interpreta mensagens do Arduino
 ├── hardware/
-│   └── serial_client.py
+│   └── serial_client.py   ← leitura serial assíncrona (QThread)
 ├── ui/
-│   └── main_window.py
+│   └── main_window.py     ← interface gráfica com fundo pixel-art
 ├── Placa/
-│   └── codigoplaca.c
-├── config.json
+│   └── codigoplaca.c      ← firmware do Arduino
+├── config.json            ← porta serial e baud rate
 ├── requirements.txt
+├── build.bat              ← script para gerar o .exe
 ├── README.md
-└── main.py
+└── main.py                ← controlador principal
 ```
 </details>
 
 ---
 
+## 🎨 Interface e UX
+- **Fundo pixel-art** gerado em Python puro via `QPainter`: céu noturno estrelado, lua com sombreamento esférico e crateras, reflexo ondulado na água e cintilações.
+- **Painel translúcido** sobreposto ao fundo com texto em `#F2EDD5` (creme quente) — contraste superior ao WCAG AAA.
+- **Sem botões na UI** — toda interação vem da placa Arduino.
+
+---
+
+## 🔌 Hardware — Arduino
+
+### Componentes
+| Componente | Pino | Função |
+|---|---|---|
+| Botão 1 | 2 | Escolha **SIM** |
+| LED Verde | 8 | Feedback visual do botão 1 |
+| Botão 2 | 5 | Escolha **NÃO** |
+| LED Vermelho | 11 | Feedback visual do botão 2 |
+
+### Protocolo Serial
+| Evento | Mensagem enviada | Python interpreta |
+|---|---|---|
+| Boot da placa | `ARDUINO_READY` | Exibe "Arduino conectado e pronto" na UI |
+| Botão 1 pressionado | `BUTTON1:HIGH` | `SIM` → gera consequência na IA |
+| Botão 2 pressionado | `BUTTON2:HIGH` | `NÃO` → gera consequência na IA |
+
+> Os LEDs acendem enquanto o botão está pressionado e apagam ao soltar.
+
+---
+
 ## 🚀 Como Executar
 
-1. Instale as dependências do Python:
+1. Instale as dependências:
    ```bash
    pip install -r requirements.txt
    ```
-2. Ajuste a porta serial em `config.json` para a COM correta do Arduino.
-3. Carregue o firmware em `Placa/codigoplaca.c` para o Arduino.
-4. Execute o programa Python:
+2. Ajuste a porta serial em `config.json` (padrão: `COM3`):
+   ```json
+   { "serial_port": "COM3", "baud_rate": 9600, "timeout": 1.0 }
+   ```
+3. Carregue o firmware `Placa/codigoplaca.c` no Arduino via Arduino IDE.
+4. Conecte o Arduino via USB e execute:
    ```bash
    python main.py
    ```
 
-### Como o Arduino interage
-- O firmware envia `BUTTON1:HIGH` quando o botão 1 é pressionado.
-- O firmware envia `BUTTON2:HIGH` quando o botão 2 é pressionado.
-- O Python converte esses eventos em escolhas `SIM` e `NÃO`.
+> Se o Arduino não estiver conectado, o programa inicia normalmente e exibe o erro serial na UI — a IA ainda funciona.
 
 ---
 
-## 📌 Integração Futura (Roadmap)
-- Melhorar o tratamento de erros de serial e reconexão automática.
-- Incluir suporte a outros protocolos de hardware.
-- Adicionar testes unitários para o parser serial e a lógica de controle.
+## 📦 Gerar Executável (.exe)
+
+Para distribuir sem precisar de Python instalado, execute na pasta do projeto:
+
+```
+build.bat
+```
+
+O script instala o PyInstaller, compila e gera:
+
+```
+dist/
+├── DilemasEticos.exe
+└── config.json        ← edite aqui para trocar a porta COM
+```
+
+> Para trocar a porta serial após compilado, basta editar `dist/config.json` — não precisa recompilar.
+
+---
+
+## 📌 Roadmap
+- Conectar API de IA em `core/ai_client.py` (Gemini, OpenAI, Claude, etc.)
+- Reconexão automática da serial em caso de desconexão do Arduino
+- Suporte a múltiplos idiomas nos cenários éticos
+- Testes unitários para o parser serial e a lógica de controle
