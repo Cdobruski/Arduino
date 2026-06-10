@@ -5,16 +5,22 @@ echo   Build - Dilemas Eticos
 echo ============================================
 echo.
 
-echo [1/3] Instalando dependencias...
-pip install PyQt5 pyserial pyinstaller
+echo Verificando dependencias...
+pip show pyinstaller > nul 2>&1
 if errorlevel 1 (
-    echo ERRO: pip nao encontrado. Certifique-se de que o Python esta no PATH.
-    pause
-    exit /b 1
+    echo Instalando dependencias...
+    pip install PyQt5 pyserial pyinstaller
+    if errorlevel 1 (
+        echo ERRO: pip nao encontrado. Certifique-se de que o Python esta no PATH.
+        pause
+        exit /b 1
+    )
+) else (
+    echo Dependencias ja instaladas. Pulando instalacao.
 )
 
 echo.
-echo [2/3] Gerando executavel...
+echo Gerando executavel...
 pyinstaller ^
   --onefile ^
   --windowed ^
@@ -30,7 +36,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [3/3] Copiando config.json para dist\...
+echo Copiando config.json...
 copy /Y config.json dist\config.json
 
 echo.
@@ -39,6 +45,6 @@ echo   PRONTO!
 echo   Executavel: dist\DilemasEticos.exe
 echo.
 echo   Para trocar a porta COM, edite:
-echo   dist\config.json  ^(serial_port^)
+echo   dist\config.json  (serial_port)
 echo ============================================
 pause

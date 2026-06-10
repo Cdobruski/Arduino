@@ -34,27 +34,22 @@ def load_config():
 
     return config
 
+
 class AIWorker(QThread):
-    """
-    Thread separada para evitar que a interface gráfica (UI) congele 
-    enquanto aguardamos a resposta da API (que pode levar segundos).
-    """
+    """Thread separada para não travar a UI enquanto a IA responde."""
     finished = pyqtSignal(str)
 
     def __init__(self, ai_client: EthicalAIClient, scenario: str = None, choice: bool = None):
         super().__init__()
         self.ai_client = ai_client
-        self.scenario = scenario
-        self.choice = choice
+        self.scenario  = scenario
+        self.choice    = choice
 
     def run(self):
         if self.scenario is None:
-            # É a primeira inicialização
             result = self.ai_client.generate_initial_scenario()
         else:
-            # É uma resposta a uma escolha
             result = self.ai_client.generate_consequence(self.scenario, self.choice)
-        
         self.finished.emit(result)
 
 
@@ -71,7 +66,7 @@ class AppController:
         self.serial_thread = SerialReadThread(
             port=self.config["serial_port"],
             baudrate=self.config["baud_rate"],
-            timeout=self.config["timeout"]
+            timeout=self.config["timeout"],
         )
         self.serial_thread.line_received.connect(self.on_serial_line)
         self.serial_thread.error.connect(self.on_serial_error)
@@ -111,12 +106,11 @@ class AppController:
         self.window.chat_display.append(
             f'<div style="text-align:left; color:#82DAFF; margin:10px 0;"><b>Arduino: {label}</b></div>'
         )
-
         self.handle_user_choice(user_choice)
 
     def on_serial_error(self, message: str):
         self.window.chat_display.append(
-            f'<div style="text-align: center; color: #CF6679; margin: 10px 0;"><b>Erro Serial:</b> {message}</div>'
+            f'<div style="text-align:center; color:#CF6679; margin:10px 0;"><b>Erro Serial:</b> {message}</div>'
         )
 
     def stop_serial(self):
@@ -129,9 +123,8 @@ class AppController:
 
         texto_escolha = "SIM" if choice else "NÃO"
         self.window.chat_display.append(
-            f'<div style="text-align: right; color: #BB86FC; margin: 10px 0;"><b>ESCOLHA: {texto_escolha}</b></div>'
+            f'<div style="text-align:right; color:#BB86FC; margin:10px 0;"><b>ESCOLHA: {texto_escolha}</b></div>'
         )
-
         self.request_ai_generation(self.current_scenario, choice)
 
     def request_ai_generation(self, scenario: str = None, choice: bool = None):
@@ -145,7 +138,6 @@ class AppController:
     def on_ai_response(self, response_text: str):
         self.current_scenario = response_text
         self.window.display_scenario(self.current_scenario)
-
         self.is_processing = False
 
     def run(self):
