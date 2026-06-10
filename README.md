@@ -32,7 +32,7 @@ Este sistema apresenta ao usuário cenários éticos complexos onde não há sa�
 ### ✨ Principais Funcionalidades
 - **Árvore de decisão dinâmica:** respostas moldam o próximo cenário em tempo real.
 - **Controle via hardware:** as escolhas SIM/NÃO vêm exclusivamente dos botões físicos do Arduino — sem interação por mouse ou teclado.
-- **Interface imersiva:** fundo pixel-art animado de lua sobre a água com estrelas piscando, ondulações e reflexos em movimento.
+- **Interface imersiva:** fundo pixel-art de lua sobre a água com painel translúcido e texto de alto contraste.
 - **Isolamento de hardware:** leitura serial assíncrona em thread separada, evitando travamentos na UI.
 - **IA generativa (plug & play):** arquitetura pronta para conectar qualquer LLM via `core/ai_client.py`.
 
@@ -53,7 +53,7 @@ Arduino/
 ├── hardware/
 │   └── serial_client.py   ← leitura serial assíncrona (QThread)
 ├── ui/
-│   └── main_window.py     ← interface gráfica com fundo pixel-art animado
+│   └── main_window.py     ← interface gráfica com fundo pixel-art
 ├── Placa/
 │   └── codigoplaca.c      ← firmware do Arduino
 ├── config.json            ← porta serial e baud rate
@@ -67,8 +67,7 @@ Arduino/
 ---
 
 ## 🎨 Interface e UX
-- **Fundo pixel-art** gerado em Python puro via `QPainter`: céu noturno, lua com sombreamento esférico e crateras, reflexo ondulado na água.
-- **Animações a 24 FPS** via `QTimer`: estrelas piscando individualmente, ondulações percorrendo a água, brilho pulsante no reflexo lunar e reflexos cintilantes (glitter).
+- **Fundo pixel-art** gerado em Python puro via `QPainter`: céu noturno estrelado, lua com sombreamento esférico e crateras, reflexo ondulado na água e cintilações.
 - **Painel translúcido** sobreposto ao fundo com texto em `#F2EDD5` (creme quente) — contraste superior ao WCAG AAA.
 - **Sem botões na UI** — toda interação vem da placa Arduino.
 
@@ -123,7 +122,7 @@ Para distribuir sem precisar de Python instalado, execute na pasta do projeto:
 build.bat
 ```
 
-O script verifica se as dependências já estão instaladas (pula o pip na segunda vez), compila e gera:
+O script instala o PyInstaller, compila e gera:
 
 ```
 dist/

@@ -1,36 +1,35 @@
+import google.generativeai as genai
+
+
 class EthicalAIClient:
-    """
-    Classe responsável por abstrair a comunicação com a API de IA (Gemini, OpenAI, etc).
-    Respeita o Princípio da Responsabilidade Única (SRP).
-    """
+    MODEL = "gemini-2.0-flash"
+
     def __init__(self, api_key: str = ""):
-        self.api_key = api_key
-        # Aqui você inicializa o SDK da IA que for utilizar
+        genai.configure(api_key=api_key)
+        self._model = genai.GenerativeModel(self.MODEL)
 
     def generate_initial_scenario(self) -> str:
-        """Busca o primeiro dilema ético para iniciar a aplicação."""
-        
-        # =====================================================================
-        # ÁREA DE INCLUSÃO DA API (CENÁRIO INICIAL)
-        # =====================================================================
-        # prompt = "Gere um dilema ético complexo envolvendo tecnologia e sociedade. Máximo de 3 linhas."
-        # resposta = api.generate_text(prompt)
-        # return resposta
-        
-        return "[Área de API] - O texto gerado pela IA para o primeiro dilema aparecerá aqui."
+        prompt = (
+            "Você é um narrador de dilemas éticos. Apresente um dilema ético complexo "
+            "em português, curto (máximo 4 linhas), impactante e sem resposta óbvia. "
+            "Envolva tecnologia, sociedade ou vida humana. "
+            "Termine com uma pergunta direta que exija apenas Sim ou Não."
+        )
+        try:
+            return self._model.generate_content(prompt).text
+        except Exception as e:
+            return f"Erro ao conectar com a IA: {e}"
 
     def generate_consequence(self, previous_scenario: str, choice: bool) -> str:
-        """Gera a consequência com base no cenário anterior e na escolha (Sim/Não)."""
-        
-        escolha_texto = "SIM" if choice else "NÃO"
-        
-        # =====================================================================
-        # ÁREA DE INCLUSÃO DA API (CONSEQUÊNCIA DINÂMICA)
-        # =====================================================================
-        # prompt = f"O cenário era: '{previous_scenario}'. O usuário escolheu: {escolha_texto}. " \
-        #          f"Gere a consequência narrativa dessa escolha e apresente um novo desdobramento " \
-        #          f"ético que exija um novo Sim ou Não."
-        # resposta = api.generate_text(prompt)
-        # return resposta
-        
-        return f"[Área de API] - A IA avaliará o cenário anterior e a escolha '{escolha_texto}' para gerar a próxima consequência e o novo dilema."
+        escolha = "SIM" if choice else "NÃO"
+        prompt = (
+            f"Cenário: {previous_scenario}\n"
+            f"Escolha feita: {escolha}\n\n"
+            "Em português: descreva em até 3 linhas a consequência dramática dessa escolha. "
+            "Depois apresente um novo dilema ético curto decorrente dela, "
+            "que também exija uma resposta Sim ou Não."
+        )
+        try:
+            return self._model.generate_content(prompt).text
+        except Exception as e:
+            return f"Erro ao conectar com a IA: {e}"
